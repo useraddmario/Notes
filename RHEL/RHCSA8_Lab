@@ -1,4 +1,165 @@
 192.168.32.129	main
 192.168.32.130 student
 
+Color $PS1 prompt:
+https://www.cyberciti.biz/faq/bash-shell-change-the-color-of-my-shell-prompt-under-linux-or-unix/
+
+[root@localhost ~]#echo $PATH
+/usr/share/Modules/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+
+[root@localhost ~]#vi hello
+[root@localhost ~]#chmod u+x hello
+[root@localhost ~]#hello
+bash: hello: command not found...
+[root@localhost ~]#./hello 
+hello world
+[root@localhost bin]#hello
+hello world
+[root@localhost bin]#which hello
+/root/bin/hello
+
+
+[root@localhost ~]#find /etc/ -exec grep -l student {} \; 2>/dev/null
+
+find files in /etc/ and run grep on each thing found for student using grep; redirect errors to /dev/null
+
+find /etc -size +100c -exec grep -l student {} \; 2>/dev/null
+
+
+[root@localhost ~]#ls -il /etc/hosts
+66233 -rw-r--r--. 1 root root 158 Sep 10  2018 /etc/hosts
+
+[root@localhost ~]#ln /etc/hosts /root/hardhosts
+[root@localhost ~]#ln -s /etc/hosts /root/symbolichosts
+[root@localhost ~]#ls -il
+66233 -rw-r--r--. 2 root root  158 Sep 10  2018 hardhosts
+10159080 lrwxrwxrwx. 1 root root   10 Jun  1 20:51 symbolichosts -> /etc/hosts
+
+
+mkdir -p files/pictures files/photos files/videos
+make parent dirs
+
+
+cut -f 1 -d : /etc/passwd | sort | tr [a-z] [A-Z]
+cut -f 1 -d : /etc/passwd | sort | tr [:lower:] [:upper:]
+converts list of first column from passwd file from lowercase to uppercase
+
+
+grep -i
+case insensitive
+
+grep -A5 <username> /etc/passwd
+gets 5 lines after match, B5 5 lines before
+
+grep -R
+recursive
+
+
+Regex
+
+use single quotes for regex
+man 7 regex
+
+Regex built around atoms
+First Element - an atom specifies what text is to be matched, can be a single char or a dot, can be a class i.e. [[:alpha:]], [[:alnum:]], [[:digit:]] or [[:upper:]]
+
+Second Element - Repetition operator - specifying how often a char occurs
+
+Third Element - indicates where to find the next char
+
+
+[root@localhost ~]#cat regtext 
+bt
+bit
+bite
+boot
+bloat
+boat
+[root@localhost ~]#grep 'b.t' regtext
+bit
+bite
+[root@localhost ~]#grep 'b.*t' regtext
+bt
+bit
+bite
+boot
+bloat
+boat
+[root@localhost ~]#grep 'bo*t' regtext
+bt
+boot
+[root@localhost ~]#grep 'b.?t' regtext
+[root@localhost ~]#egrep 'b.?t' regtext
+bt
+bit
+bite
+
+^ - beginning of line
+$ - end of line
+\< - beginning of word
+\> - end of word
+* - zero or more times
++ - one or more times
+? - zero or one time
+{n} - exactly n times
+
+
+
+Awk
+
+
+-F : field separator
+{ print $4 } - print the fourth field
+
+awk -F : '/anna/ { print $4 }' /etc/passwd
+1001
+
+[root@localhost ~]#grep anna /etc/passwd
+anna:x:1001:1001::/home/anna:/bin/bash
+
+prints the last field - useful for lines of differing length
+awk -F : '{ print $NF }' /etc/passwd
+/bin/bash
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+
+
+
+ls -l /etc/ | awk '/pass/ { print }'
+
+
+Sed
+
+stream editor
+
+[root@localhost ~]#cat sedfile 
+one
+two
+three
+four
+five
+[root@localhost ~]#sed -n 4p sedfile 
+four
+
+-i - writes to the file
+[root@localhost ~]#sed -i s/four/FOUR/g sedfile
+[root@localhost ~]#cat sedfile 
+one
+two
+three
+FOUR
+five
+
+
+[root@localhost ~]#sed -i -e '2d' sedfile 
+[root@localhost ~]#cat sedfile 
+one
+three
+FOUR
+five
+
+
+
 
