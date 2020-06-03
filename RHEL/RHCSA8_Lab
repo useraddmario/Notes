@@ -162,4 +162,153 @@ five
 
 
 
+User and Group Management
+
+useradd
+
+usermod -aG
+-a append to groups, -G alter groups
+
+userdel -r
+-r remove home dir and mail spool
+
+passwd
+
+/etc/login.defs
+
+
+/etc/default/useradd
+
+[root@localhost ~]#useradd -D
+GROUP=100
+HOME=/home
+INACTIVE=-1
+EXPIRE=
+SHELL=/bin/bash
+SKEL=/etc/skel
+CREATE_MAIL_SPOOL=yes
+
+system level defaults for users
+
+/etc/skel
+files here are automatically added to a new user's home dir
+[root@localhost skel]#ls -lah
+total 24K
+drwxr-xr-x.   3 root root   78 Apr 23 12:47 .
+drwxr-xr-x. 137 root root 8.0K Jun  2 14:16 ..
+-rw-r--r--.   1 root root   18 Jan 14  2019 .bash_logout
+-rw-r--r--.   1 root root  141 Jan 14  2019 .bash_profile
+-rw-r--r--.   1 root root  312 Jan 14  2019 .bashrc
+drwxr-xr-x.   4 root root   39 Apr 23 12:46 .mozilla
+
+
+/etc/passwd
+username:password:UID:GID:comment:home dir:default shell
+
+/etc/shadow
+username:password hash:min days:max days:warning threshold:account inactive days:time since account disabled
+
+password hash = $ delimiter $hash algo$salt value$hashed password
+
+http://www.yourownlinux.com/2015/08/etc-shadow-file-format-in-linux-explained.html
+
+
+/etc/group
+
+
+Group Membership
+
+Must be a member of at least one group
+
+Primary group membership is in /etc/passwd
+
+primary group is group owner of files user creates
+
+Secondary group membership is in /etc/groups
+
+[root@localhost ~]#id student
+uid=1000(student) gid=1000(student) groups=1000(student),10(wheel)
+
+
+groupadd
+groupdel
+groupmod
+
+lid -g <groupname>
+get all users of a group
+
+chage <username>
+if you don't use switches as root it becomes interactive
+
+pam_tally2 
+
+
+
+Umask
+
+umask is a default shell setting in /etc/profile that subtracts from the default permissions 
+
+666 - default perms for files
+777 - default perms for folders
+
+if umask is 0022 a file created would default to 644; 666 - 022
+
+can be set for individual users in their .bash_profile file
+
+
+Special Permissions
+
+SUID - can run executable files as the owner; no meaning for directory
+
+SGID - run as group owner; will inherit the directory group owner - files created in the dir will be writable for all members of the groups
+
+Sticky Bit - no use for files; can delete only if you are the owner
+
+
+SUID - 
+chmod 4770 myfile
+or
+chmod u+s myfile
+
+SGID -
+chmod 2770 mydir
+or
+chmod g+s mydir
+
+Sticky Bit -
+chmod 1770 mydir
+chmod +t mydir
+
+
+
+ACLs
+
+the normal ACL applies to existing files only
+
+A default ACL on a dir will apply to new files also
+
+
+getfacl 
+shows current settings
+
+
+set facl -R -m g:<group_name>:rx /data/groups
+-R recursive, -m modify, g: for group: rx permissions, directory
+
+set facl -m d:<group_name>:rx /data/groups
+sets a default acl on the directory for all new files after
+
+setfacl -b name
+-b removes all
+
+set default acl
+setfacl d:g:sales:rx /data
+
+set default acl after acls already in place
+setfacl -m d:g:sales:rx /data
+
+default acls only work on new files so you have to run two commands one for existing and one for default
+
+
+
 
