@@ -755,8 +755,229 @@ test -f /etc/sysconfig/httpd-disable-posttrans || \
   /bin/systemctl try-restart --no-block httpd.service htcacheclean.service >/dev/null 2>&1 || :
 
 
+Working with Systemd
+
+Managed items are called units
+
+Units:
+
+services
+mounts
+timers
+many more
 
 
+systemctl - cli interface
+
+default systems unit files are in /usr/lib/systemd/system
+Don't edit these
+
+Custom unit files go in /etc/systemd/system
+They are used as overlays to the system ones
+
+run-time auto gen are in /run/systemd
+
+systemctl edit unit.service
+use to edit unit files
+
+systemctl show
+
+systemctl daemon-reload
+may be required
+
+
+systemctl cat vsftpd.service
+view the unit file for vsftp
+
+systemctl show vsftpd.service
+list of parameters that can be used on the service unit file
+
+
+
+systemctl edit vsftpd.service
+
+[Service]
+Restart=always
+RestartSec=5s
+
+systemctl daemon-reload
+
+systemctl restart vsftpd
+
+
+killall vsftpd
+
+systemctl status vsftpd
+
+● vsftpd.service - Vsftpd ftp daemon
+   Loaded: loaded (/usr/lib/systemd/system/vsftpd.service; disabled; vendor preset: disabled)
+  Drop-In: /etc/systemd/system/vsftpd.service.d
+           └─override.conf
+   Active: activating (auto-restart) since Thu 2020-06-04 11:55:18 CST; 1s ago
+  Process: 56330 ExecStart=/usr/sbin/vsftpd /etc/vsftpd/vsftpd.conf (code=exited, status=0/SUCCESS)
+ Main PID: 56331 (code=killed, signal=TERM)
+
+
+yum module install httpd
+
+systemctl edit httpd
+
+[Service]
+Restart=always
+RestartSec=60s
+
+
+systemctl enable httpd.service
+
+systemctl daemon-reload
+
+systemctl restart httpd
+
+killall httpd
+
+systemctl status httpd
+
+
+
+
+Scheduling Tasks
+
+cron - at - systemd timers
+
+
+/etc/crontab - deprecated
+
+/etc/cron.deny
+
+/etc/cron.d - for rpms mostly
+
+
+anacron
+makes sure that the jobs run, but not at a specific time; if the server goes down and comes back up the job will run after
+
+/etc/cron.daily
+
+/etc/cron.hourly
+
+/etc/cron.monthly
+
+/etc/cron.weekly
+
+
+Use crontab -e as a specific user, usually root
+
+minute	hour	day of month	month	day of week
+
+doesn't have STDOUT
+
+man5 crontab
+
+
+systemd timers
+
+man 7 systemd-timer
+man 7 systemd-time
+
+[root@server1 system]#pwd
+/usr/lib/systemd/system
+[root@server1 system]#ls *timer
+chrony-dnssrv@.timer  fstrim.timer           mdadm-last-resort@.timer  systemd-tmpfiles-clean.timer
+dnf-makecache.timer   insights-client.timer  mlocate-updatedb.timer    unbound-anchor.timer
+
+[root@server1 system]#ls fstrim*
+fstrim.service  fstrim.timer
+they go together
+
+[root@server1 system]#cat fstrim.timer 
+[Unit]
+Description=Discard unused blocks once a week
+Documentation=man:fstrim
+
+[Timer]
+OnCalendar=weekly
+AccuracySec=1h
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+[root@server1 system]#cat fstrim.service 
+[Unit]
+Description=Discard unused blocks
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/fstrim -av
+
+
+[root@server1 system]#systemctl status fstrim.service 
+● fstrim.service - Discard unused blocks
+   Loaded: loaded (/usr/lib/systemd/system/fstrim.service; static; vendor preset: disabled)
+   Active: inactive (dead)
+[root@server1 system]#systemctl status fstrim.timer
+● fstrim.timer - Discard unused blocks once a week
+   Loaded: loaded (/usr/lib/systemd/system/fstrim.timer; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+  Trigger: n/a
+     Docs: man:fstrim
+[root@server1 system]#systemctl enable fstrim.timer
+Created symlink /etc/systemd/system/timers.target.wants/fstrim.timer → /usr/lib/systemd/system/fstrim.timer.
+[root@server1 system]#systemctl start fstrim.timer
+[root@server1 system]#systemctl status fstrim.timer
+● fstrim.timer - Discard unused blocks once a week
+   Loaded: loaded (/usr/lib/systemd/system/fstrim.timer; enabled; vendor preset: disabled)
+   Active: active (waiting) since Thu 2020-06-04 13:17:45 CST; 7s ago
+  Trigger: Mon 2020-06-08 00:00:00 CST; 3 days left
+     Docs: man:fstrim
+
+Jun 04 13:17:45 server1.example.local systemd[1]: Started Discard unused blocks once a week.
+
+
+
+
+
+At
+
+
+atd service
+
+at <time>
+type one or more jobs and hit Ctrl-D
+
+atq
+
+atrm
+remove a job
+
+[root@server1 system]#echo "logger hello" | at 1323
+warning: commands will be executed using /bin/sh
+job 1 at Thu Jun  4 13:23:00 2020
+[root@server1 system]#atq
+1	Thu Jun  4 13:23:00 2020 a root
+[root@server1 system]#atq
+[root@server1 system]#tail /var/log/messages
+Jun  4 13:23:00 server1 root[59078]: hello
+
+
+systemd-tmpfiles
+
+/usr/lib/tmpfiles.d
+manages settings for creation, deletion and cleanup of temp files
+
+systemd-tmpfiles-clean.timer
+systemd-tempfiles-clean.service
+
+systemd-tmpfiles --clean
+can be run manually
+
+/usr/lib/tmpfiles.d/tmp.conf
+contains settings for cleanup
+
+copy file /usr/lib/tmpfiles.d/tmp.conf to /etc/tmpfiles.d to edit
+
+after mods use 
+sytemd-tmpfiles --clean /etc/tmpfiles.d/tmp.conf
+
+man tmpfiles.d
 
 
 
