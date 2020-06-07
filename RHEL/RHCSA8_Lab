@@ -982,5 +982,112 @@ man tmpfiles.d
 
 
 
+Configuring Logging
+
+
+systemd-journald
+now in charge of logging; not persistent by default
+
+/dev/log
+rsyslog makes sure the journal is written to rsyslog
+
+journalctl
+
+to make journald persistent, just make a directory at
+/var/log/journal
+
+then restart systemd-journald
+
+
+rsyslogd
+
+/etc/rsyslog.conf
+
+/etc/rsyslog.d/
+
+facility - what is going to be logged
+severity - the severity from which should be logged
+destination - where the logs should be written to 
+
+normally go to /var/log
+
+use logger command the write messages to rsyslog manually
+
+rsyslogd is and must be backwards compatible with syslog
+
+fixed number of facilities, none can be added
+
+local{0..7} for expansion
+
+some services don't use syslog
+
+
+
+
+systemd-journald
+log service for systemd
+
+integrates well with systemctl status <unit>
+
+journalctl can be used to read log entries
+Shift g to go to bottom, arrow to the right to see long lines
+use tab completion to see list of filtering options
+
+[root@server1 log]#journalctl UNIT=sshd
+-- Logs begin at Wed 2020-06-03 16:22:03 CST, end at Thu 2020-06-04 19:17:26 CST. --
+-- No entries --
+
+messages are logged to rsyslogd usung the rsyslogd imjournal module
+
+make journal persistent
+mkdir /var/log/journal
+
+built in rotation for the journal  runs monthly
+
+the journal cannot grow beyond 10% of the size of the fs it is on
+
+the journal will also make sure 15% of fs it is on will stay free
+
+those settings can be altered in /etc/systemd/journals.conf
+
+
+
+[root@server1 log]#systemctl status systemd-journald
+● systemd-journald.service - Journal Service
+   Loaded: loaded (/usr/lib/systemd/system/systemd-journald.service; static; vendor preset: disabled)
+   Active: active (running) since Wed 2020-06-03 16:22:06 CST; 1 day 3h ago
+     Docs: man:systemd-journald.service(8)
+           man:journald.conf(5)
+ Main PID: 738 (systemd-journal)
+   Status: "Processing requests..."
+    Tasks: 1 (limit: 23859)
+   Memory: 3.1M
+   CGroup: /system.slice/systemd-journald.service
+           └─738 /usr/lib/systemd/systemd-journald
+
+Jun 03 16:22:06 server1.example.local systemd-journald[738]: Journal started
+Jun 03 16:22:06 server1.example.local systemd-journald[738]: Runtime journal (/run/log/journal/87aadb8e2f924bb799d3704bff740fa1) is 8.0M>
+Jun 03 16:22:06 server1.example.local systemd-journald[738]: Runtime journal (/run/log/journal/87aadb8e2f924bb799d3704bff740fa1) is 8.0M>
+lines 1-15/15 (END)
+
+
+Jun 03 16:22:06 server1.example.local systemd-journald[738]: Runtime journal (/run/log/journal/87aadb8e2f924bb799d3704bff740fa1) is 8.0M, max 187.9M, 179.9M free.
+
+
+Log Rotate
+
+log rotate is started in cron.daily
+
+/etc/logrotate.conf
+/etc/logrotate.d/
+
+
+Managing Storage
+
+
+
+
+
+
 
 

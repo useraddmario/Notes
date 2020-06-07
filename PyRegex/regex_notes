@@ -1,0 +1,27 @@
+Jupyter Notebooks
+
+Help > Keyboard Shortcuts
+
+Shift-Enter - Run a cell and move to the next cell
+
+Ctrl-Enter - Run a cell, but stay in that cell
+
+Esc-a - Insert a cell above
+
+Esc-b - Insert a call below
+
+tab completion is available
+
+Shift-Tab - access help for a method like re.search
+
+jupyter notebook & - Turn on and bg
+
+jobs - get job number
+
+fg <number from jobs> - bring back to the fg
+
+Ctrl-C - end Jupyter Notebooks execution
+
+
+
+

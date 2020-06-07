@@ -1,0 +1,130 @@
+var_ls = !ls -l
+
+
+df = !df
+df.sort(3, nums = True)
+
+In [73]: ls = !ls -l /usr/bin                                                                                                 
+
+In [75]: ls.grep('kill')                                                                                                      
+Out[75]: 
+['-rwxr-xr-x 1 root root       30952 Feb 27 13:52 kill',
+ '-rwxr-xr-x 1 root root       32024 Nov 12  2019 killall',
+ 'lrwxrwxrwx 1 root root          14 May  4 23:46 pidof -> /sbin/killall5',
+ 'lrwxrwxrwx 1 root root           5 May  4 23:46 pkill -> pgrep',
+ '-rwxr-xr-x 1 root root       30952 Feb 27 13:52 skill',
+ 'lrwxrwxrwx 1 root root           5 May  4 23:46 snice -> skill',
+ '-rwxr-xr-x 1 root root       14648 Feb 29 14:29 xkill']
+
+
+In [81]: %%bash 
+    ...: uname -a 
+    ...:  
+    ...:                                                                                                                      
+Linux ubuntu 5.4.0-33-generic #37-Ubuntu SMP Thu May 21 12:53:59 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+
+
+In [16]: %%writefile print_time.py    
+...: #!/usr/bin/env python    
+...: import datetime    
+...: print(datetime.datetime.now().time())    
+...:    
+...:    
+...:Writing print_time.py
+
+In [17]: cat print_time.py
+#!/usr/bin/env python
+import datetime
+print(datetime.datetime.now().time())
+In [18]: !python print_time.py
+
+19:06:00.594914
+
+
+In [20]: %who
+
+df     ls     var_ls
+
+
+
+In [23]: with open('big-data.txt', 'r') as source_file:    
+	...:     with open('big-data-corrected.txt', 'w') as target_file:    
+	...:         for line in source_file:    
+	...:             target_file.write(line)    
+
+
+
+
+In [46]: def line_reader(file_path):
+    ...:     with open(file_path, 'r') as source_file:
+    ...:         for line in source_file:
+    ...:             yield line
+    ...:
+
+In [47]: reader = line_reader('big-data.txt')
+
+In [48]: with open('big-data-corrected.txt', 'w') as target_file:
+    ...:     for line in reader:
+    ...:         target_file.write(line)
+
+
+
+In [1]: os.listdir('.') 1
+Out[1]: ['__init__.py', 'os_path_example.py']
+
+In [2]: os.rename('_crud_handler', 'crud_handler') 2
+
+In [3]: os.chmod('my_script.py', 0o777) 3
+
+In [4]: os.mkdir('/tmp/holding') 4
+
+In [5]: os.makedirs('/Users/kbehrman/tmp/scripts/devops') 5
+
+In [6]: os.remove('my_script.py') 6
+
+In [7]: os.rmdir('/tmp/holding') 7
+
+In [8]: os.removedirs('/Users/kbehrman/tmp/scripts/devops') 8
+
+In [9]: os.stat('crud_handler') 9
+Out[9]: os.stat_result(st_mode=16877,
+                       st_ino=4359290300,
+                       st_dev=16777220,
+                       st_nlink=18,
+                       st_uid=501,
+                       st_gid=20,
+                       st_size=576,
+                       st_atime=1544115987,
+                       st_mtime=1541955837,
+                       st_ctime=1567266289)
+
+
+In [1]: import os
+
+In [2]: cur_dir = os.getcwd() 1
+
+In [3]: cur_dir
+Out[3]: '/Users/kbehrman/Google-Drive/projects/python-devops/samples/chapter4'
+
+In [4]: os.path.split(cur_dir) 2
+Out[4]: ('/Users/kbehrman/Google-Drive/projects/python-devops/samples',
+         'chapter4')
+
+In [5]: os.path.dirname(cur_dir) 3
+Out[5]: '/Users/kbehrman/Google-Drive/projects/python-devops/samples'
+
+In [6]: os.path.basename(cur_dir) 4
+Out[6]: 'chapter4'
+
+[200~In [7]: while os.path.basename(cur_dir):
+   ...:     cur_dir = os.path.dirname(cur_dir)
+   ...:     print(cur_dir)
+   ...:
+/Users/kbehrman/projects/python-devops/samples
+/Users/kbehrman/projects/python-devops
+/Users/kbehrman/projects
+/Users/kbehrman
+/Users
+/
+
+

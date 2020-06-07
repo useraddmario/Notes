@@ -1,0 +1,196 @@
+PDB
+
+open from interpreter
+
+(.mpsforsa) useraddmario@ubuntu:~/python/mpsforsa/Chapter02$ ipython
+Python 3.8.2 (default, Apr 27 2020, 15:53:34) 
+Type 'copyright', 'credits' or 'license' for more information
+IPython 7.15.0 -- An enhanced Interactive Python. Type '?' for help.
+
+In [1]: import pdn_example                                                        
+---------------------------------------------------------------------------
+ModuleNotFoundError                       Traceback (most recent call last)
+<ipython-input-1-a236750dd58f> in <module>
+In [2]: import pdb_example                                                        
+
+In [3]: import pdb                                                                
+
+In [4]: pdb.run('pdb_example.Student(5).print_std()')                             
+> <string>(1)<module>()
+(Pdb) 
+EOF        cl         disable    interact   next       retval     unalias
+a          clear      display    j          p          run        undisplay
+alias      commands   down       jump       pp         rv         unt
+args       condition  enable     l          q          s          until
+b          cont       exit       list       quit       source     up
+break      continue   h          ll         r          step       w
+bt         d          help       longlist   restart    tbreak     whatis
+c          debug      ignore     n          return     u          where
+(Pdb) continue
+0
+1
+2
+3
+4
+
+In [5]: exit()  
+
+
+
+open from commandline
+
+(.mpsforsa) useraddmario@ubuntu:~/python/mpsforsa/Chapter02$ python -m pdb pdb_example.py 
+> /home/useraddmario/python/mpsforsa/Chapter02/pdb_example.py(1)<module>()
+-> class Student:
+(Pdb) continue
+0
+1
+2
+3
+4
+The program finished and will be restarted
+> /home/useraddmario/python/mpsforsa/Chapter02/pdb_example.py(1)<module>()
+-> class Student:
+(Pdb) exit
+
+
+open from within script
+
+.mpsforsa) useraddmario@ubuntu:~/python/mpsforsa/Chapter02$ cat pdb_example.py 
+import pdb
+
+class Student:
+	def __init__(self, std):
+		self.count = std
+
+	def print_std(self):
+		for i in range(self.count):
+			pdb.set_trace()
+			print(i)
+		return
+
+
+if __name__ == '__main__':
+	Student(5).print_std()
+
+(.mpsforsa) useraddmario@ubuntu:~/python/mpsforsa/Chapter02$ python pdb_example.py 
+> /home/useraddmario/python/mpsforsa/Chapter02/pdb_example.py(10)print_std()
+-> print(i)
+(Pdb) continue
+0
+> /home/useraddmario/python/mpsforsa/Chapter02/pdb_example.py(9)print_std()
+-> pdb.set_trace()
+(Pdb) exit
+
+
+
+Use trace module to see line by line where the issue is:
+
+(.mpsforsa) useraddmario@ubuntu:~/python/mpsforsa/Chapter02$ python -m trace --trace trace_example.py 
+ --- modulename: trace_example, funcname: <module>
+trace_example.py(1): class Student:
+ --- modulename: trace_example, funcname: Student
+trace_example.py(1): class Student:
+trace_example.py(2): 	def __init__(self, std):
+trace_example.py(5): 	def go(self):
+trace_example.py(9): if __name__ == '__main__':
+trace_example.py(10): 	Student(5).go()
+ --- modulename: trace_example, funcname: __init__
+trace_example.py(3): 		self.count = std
+ --- modulename: trace_example, funcname: go
+trace_example.py(6): 		for i in range(self.count):
+trace_example.py(7): 			print(i)
+0
+trace_example.py(6): 		for i in range(self.count):
+trace_example.py(7): 			print(i)
+1
+trace_example.py(6): 		for i in range(self.count):
+trace_example.py(7): 			print(i)
+2
+trace_example.py(6): 		for i in range(self.count):
+trace_example.py(7): 			print(i)
+3
+trace_example.py(6): 		for i in range(self.count):
+trace_example.py(7): 			print(i)
+4
+trace_example.py(6): 		for i in range(self.count):
+trace_example.py(8): 		return
+
+
+cProfile measure execution time
+
+.mpsforsa) useraddmario@ubuntu:~/python/mpsforsa/Chapter02$ python -m cProfile cprof_example.py 
+Local Value:  4466
+Global Value:  0
+         6 function calls in 0.000 seconds
+
+   Ordered by: standard name
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.000    0.000 cprof_example.py:1(<module>)
+        1    0.000    0.000    0.000    0.000 cprof_example.py:2(mul_numbers)
+        1    0.000    0.000    0.000    0.000 {built-in method builtins.exec}
+        2    0.000    0.000    0.000    0.000 {built-in method builtins.print}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+
+
+
+timeit - time execution of a portion of code x 1,000,000
+
+(.mpsforsa) useraddmario@ubuntu:~/python/mpsforsa/Chapter02$ python -m cProfile cprof_example.py 
+Local Value:  4466
+Global Value:  0
+         6 function calls in 0.000 seconds
+
+   Ordered by: standard name
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.000    0.000 cprof_example.py:1(<module>)
+        1    0.000    0.000    0.000    0.000 cprof_example.py:2(mul_numbers)
+        1    0.000    0.000    0.000    0.000 {built-in method builtins.exec}
+        2    0.000    0.000    0.000    0.000 {built-in method builtins.print}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+
+
+(.mpsforsa) useraddmario@ubuntu:~/python/mpsforsa/Chapter02$ cat timeit_example.py 
+import timeit
+prg_setup = "from math import sqrt"
+prg_code = '''
+def timeit_example():
+	list1 = []
+	for x in range(50):
+		list1.append(sqrt(x))
+''' 
+# timeit statement
+print(timeit.timeit(setup = prg_setup, stmt = prg_code, number = 10000))
+
+(.mpsforsa) useraddmario@ubuntu:~/python/mpsforsa/Chapter02$ python timeit_example.py 
+0.0006399769990821369
+
+
+There are various ways to make your Python programs run faster, such as the following:
+
+Profile your code so you can identify the bottlenecks
+Use built-in functions and libraries so the interpreter doesn't need to execute loops
+Avoid using globals as Python is very slow in accessing global variables
+Use existing packages
+
+
+Whenever we use unittest, there are some methods we use in our script. These methods are the following:
+
+    assertEqual() and assertNotEqual(): This checks for an expected result
+    assertTrue() and assertFalse(): This verifies a condition
+    assertRaises(): This verifies that a specific exception gets raised
+    setUp() and tearDown(): This defines instructions that are executed before and after each test method
+
+You can use the unittest module from the command line as well. So, you can run the previous test script as follows:
+
+student@ubuntu:~$ python3 -m unittest test_addition.py
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+ 
+OK
+
+
+
