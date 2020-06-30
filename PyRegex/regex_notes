@@ -22,6 +22,301 @@ fg <number from jobs> - bring back to the fg
 
 Ctrl-C - end Jupyter Notebooks execution
 
+Can use hex octal or unicode in regex
+
+inline options
+syntax - (?<letter>)
+
+Option Effect on match
+i Case-insensitive
+m Multiline mode
+L Locale specific
+u Unicode dependent
+s Single-line mode
+x Ignore white space
+
+| - or
+
+Sets
+
+[set] In that set
+[^set] Not in that set - If the caret is not at the beginning then it is a literal caret
+[a–z] In the a-z range
+[^a–z] Not in the a-z range
+[a-dx-z] multiple ranges
+
+Wildcards
+
+. - matches every thing except newline
+\. or [.] - literal dot(full stop)
+
+
+
+Control characters
+
+Use To match Unicode
+\t Horizontal tab \u0009
+\v Vertical tab \u000B
+\b Backspace \u0008
+\e Escape \u001B
+\r Carriage return \u000D
+\f Form feed \u000C
+\n New line \u000A
+\a Bell (alarm) \u0007
+
+
+
+Anchors
+
+specify:
+word boundries
+string boundries
+line boundries
+
+^ - At start of string or line
+\A - At start of string
+\Z - At endof string
+$ - At end of string or line
+\b - On word boundary
+\B - Not on word boundary
+
+(?mi)$apple - match apple, case insensative at the end of a sentence in a multiline string
+
+
+Character Classes
+
+\w - Word character. [0-9_a-zA-Z] and Unicode word characters
+\W - Non-word character
+\d - Decimal digit and Unicode digits
+\D - Not a decimal digit
+\s - White-space character[ \t\n\r\f\v] and Unicode spaces
+\S - Non-white-space char
+
+
+Quantifiers
+
+specifies is it's required or not, or how many matches are required
+
+*	0 or more times
++	1 or more times
+??	0 or 1 time
+{n}	Exactly n times
+{n,}	At least n times
+{n,m}	From n to m times
+
+
+[a-z][0-9] - one letter, one digit
+[a-z][0-9]* - one letter, zero or more digits
+[a-z][0-9]+ - one letter, one or more digits
+[a-z][0-9]? - one letter, optional zero or one
+
+{n}	Exactly n times
+{n,}	At least n times
+{n,m}	From n to m times
+
+[a-z]{2}[0-9] - two letters, one digit
+[a-z]{2,}[0-9] - at least two letters, one digit
+[a-z]{2,4}[0-9] - two to four letters, one digit
+\b[a-z]{2,4}[0-9]\b - two to four letters, one digit, word boundries
+
+
+Comments
+
+(?# comment) - Add inline comment, can add multiple
+# - Add x-mode commentto end
+
+[a-z](?# check for letter)[0-9]?(?# check for optional digit) - multiple inline comments
+
+(?x)[a-z][0-9]?# check for letter followed by an optional digit
+
+
+Conditionals
+
+a|b - Either a or b
+(?(n) yes expression| no expression) - yes expression if group n is matched, no expression if group n isn't matched
+(?(name) yes expression| no expression) - yes expression if name is matched, no expression if name isn't matched
+
+
+\b(?P<test>\d)?(?(test)\d{2}|[a-z]{4})\b
+Match something in a word boundry starting with a digit and has exactly two more digits, or match if it has exactly four letters
+
+
+
+Regular Expression Engine Points
+
+
+Python, Perl and .Net regex expression engines are known as Nondeterministic Finite Automation
+
+Pattern drives how the engine processes input test and what path to take
+
+Remembers previous successful state and incase of incomplete match, it can go back to previous successful state and try a different path
+
+Regex engine is generic in nature and takes the path as instructed in pattern.  Puts the responsibility on the dev to define efficient patterns to guide the engine
+
+
+Regular Expression Engine Points - Five key points
+
+one char at a time
+left to right
+greedy, lazy and backtracking
+groups
+look ahead and behind
+
+
+one char at a time
+
+pattern and target get eval one char at a time
+path taken depends on the match
+
+
+left to right
+
+pattern defined left most is attempted first and gradually moves right to attempt other parts of the pattern
+
+all viable patterns are evaluated before proceeding with the next char in the text
+
+pattern
+car|carpet
+text
+carpet and car
+matches
+car	car
+
+
+pattern
+\b(car|carpet)\b
+text
+carpet and car
+matches
+carpet	car(but it is inefficient because it failed on a car match at the beginning of carpet)
+
+pattern
+\bcar(pet)?\b
+test
+carpet and car
+matches
+carpet	car
+
+Summary:
+***patterns and text are eval l to r***
+***To minimize backtracking, extract common patterns out***
+***define more precise patterns first, followed by more generic patterns***
+
+
+
+greedy, lazy and backtracking
+
+quantifiers * + ? are greedy, they try to match as much of the text as possible
+
+quantifiers like these applied to wildcards like . can consume the entire text and starve the rest of the pattern
+
+regex engines evaluate and backtrack one step at a time to see if it can match the rest of the pattern
+
+greedy - consume as much of the text as possible and then give-up the characters to match the rest of the pattern
+
+
+Greedy and backtracking
+
+pattern
+.+(\d+)[.!]
+text
+First 1234. Second 5678!
+matches
+First 1234. Second 5678!(After the match of 1234 the .+ greedy qualifier consumes the rest of the text.  Then the engine goes back and matched the 8 and ! returning the whole sentence as a match)
+
+Lazy
+
+lazy - match as few times as possible for quantifiers and proceed to match the rest of the pattern;  "consume as few of the input text as possible and then attempts to match the rest of the pattern
+
+when there is no match for the pattern, lazy mode backtracks on the patter and expands to match more chars in input
+
+quantifiers * + ? are greedy, to change them to lazy mode add a ?
+
+
+pattern
+.+?(\d+)[.!]
+text
+First 1234. Second 5678!
+matches
+1234.	5678! (After the match of 1234 the .+? lazy qualifier consumes the rest of the digits and then checks for punctuation producing a match. then moves to the rest of the sentence)
+
+
+Exhaustive - backtracking
+
+pattern
+\bapple(past(ry|e)|pie)\b
+text
+Twenty popular recipes to make applepaste Popular applepie recipes
+matches
+
+***lazy mode allows you to choose how quantifiers are used to process the text***
+
+
+
+Groups
+
+any pattern specified inside a parenthesis
+
+break a pattern into sub-patterns
+pinpoint location of matching string and substrings
+reuse common patterns
+mark as optional
+minimize backtracking
+extract values
+capture repeating subpatterns
+\d+(,\d{3})*(\.\d{2})?
+matches
+123
+123,456
+123,456,789
+
+can be accessed by position(left to right) or can be named
+group(0) is the whole match, it is always better to name groups
+
+group capture is expensive, turn it off if not needed
+\d+(,\d{3})*(\.\d{2})? - since we don't care about the groups here
+\d+(?:,\d{3})*(?:\.\d{2})? - ?: turns off group capture
+
+group back reference/substitution
+
+back reference - group that was captures earlier and used subsequently in pattern
+pattern
+(?P<word>\w+)\s+(?P=word)\b
+text
+capture duplicate duplicate words
+
+pattern
+(?P<letter>\w+)(?P=letter)
+
+
+substitution pattern
+(?P<word>\w+)\s+(?P=word)\b
+replacement pattern
+\g<word>
+
+
+
+Look ahead and behind
+
+look ahead - peak at what is coming up next w/o consuming the chars
+
+look behind - look at what came before
+
+both are called zero width assertion
+	returns ture or false
+	doesn't consume chars
+	similar to 'if (expression) yes_expression'
+
+look a and b can contain patterns
+
+allows you to implement more complex conditional logic
+
+doesn't backtrack - once it returns a True/False, job is done.  If pattern doesn't match look a and b would not backtrack to try another match
+
+
+
+
+
 
 
 

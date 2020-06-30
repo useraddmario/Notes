@@ -1084,9 +1084,78 @@ log rotate is started in cron.daily
 
 Managing Storage
 
+LVM
+
+fdisk /dev/sda
+mark as 8e
+
+pvcreate /dev/sda1
+
+pvdisplay
+
+vgcreate vgdb /dev/sda1
+
+vgdisplay
+
+lvcreate -L +1020 vgdb /dev/sda1 -n lvdb
+
+lvdisplay
+
+mkfs.xfs /dev/vgdb/lvdb
+
+vim /etc/fstab
+/dev/vgdb/lvdb	/mounts/lvdb	xfs	defaults	0 0
+
+mkdir -p /mounts/lvdb
+
+reboot
 
 
+VDO
 
+yum install vdo kmod-kvdo
+
+init 6
+
+vdo create --name=vdo1 --device=/dev/sdb --vdoLogicalSize=1T
+
+partprobe
+
+mkfs.xfs -K /dev/mapper/vdo1
+
+udevadm settle
+
+mkdir /mounts/vdo
+
+vim /etc/fstab
+/dev/mapper/vdo1	/mounts/vdo	xfs	x-systemd.requires=vdo.service	0 0
+
+mount -a
+
+vdostats --human-readable
+
+reboot
+
+vdostats --human-readable
+
+
+Luks encryption
+
+cryptsetup luksFormat /dev/sda2
+
+cryptsetup luksOpen /dev/sda2 secret
+
+ls -l /dev/mapper
+
+mkfs.xfs /dev/mapper/secret
+
+mkdir /mounts/secret
+
+vim /etc/fstab
+
+vim /etc/crypttab
+
+reboot
 
 
 

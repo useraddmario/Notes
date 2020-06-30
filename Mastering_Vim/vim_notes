@@ -1,0 +1,99 @@
+w   move to beginning of next word
+e   move to the end of the next word
+b   move backwards to the beginning of the next word
+W,E,B   whitespace delimited words
+
+{	Move back by one paragraph
+}	Move forward by one paragraph
+
+gg  move to top of document
+G   move to bottom of document
+A   append at end of sentence
+
+c   change , compoun
+cw  change word
+cW  change from cursor to white space
+
+d   delete, compound command
+dw  delete word
+d4l delete four letters
+
+cc  clear the line, insert mode, preserves indentation
+dd  delete the line
+
+u   undo
+r   redo
+
+
+
+Prepend something to specify the context:  help-context
+
+        WHAT                  PREPEND    EXAMPLE
+    Normal mode command                  :help x
+    Visual mode command         v_       :help v_u
+    Insert mode command         i_       :help i_<Esc>
+    Command-line command        :        :help :quit
+    Command-line editing        c_       :help c_<Del>
+    Vim command argument        -        :help -r
+    Option                      '        :help 'textwidth'
+    Regular expression          /        :help /[
+  See help-summary for more contexts and an explanation.
+
+  Search for help:  Type ":help word", then hit CTRL-D to see matching
+                    help entries for "word".
+
+
+:help <optional search term> <optional list of all tags containing sub-string search term - ctrl + d>
+
+/<search term>    forward search
+?<search term>  backward search
+
+
+
+Buffers
+
+:ls :files :buffers
+view buffers
+
+:e <relative filename>
+open buffer with another file
+
+:ls 
+to view again
+
+:b1
+to view buffer one
+
+:b cat
+partial filenames work for a switch also
+
+:b py
+if the text is not unique hit tab completion to cycle through buffers
+
+:bd
+to close a buffer
+
+:bn
+next buffer
+
+:bp
+previous buffer
+
+
+
+***Plugin Research - vim-unimpaired***
+
+
+
+Windows
+
+:h window-moving
+:h window resize
+
+:split :sp
+horizontal split
+
+:vsplit :vs
+vertical split
+
+
