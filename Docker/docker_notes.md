@@ -1,51 +1,65 @@
-Architecture Overview
-Docker architecture:
+#Docker architecture:
 
-Client-server architecture
-Client talks to the Docker daemon
-The Docker daemon handles:
-Building
-Running
-Distributing
-Both communicate using a REST API:
-UNIX sockets
-Network interface
-The Docker daemon (dockerd):
 
-Listens for Docker API requests and manages Docker objects:
-Images
-Containers
-Networks
-Volumes
-The Docker client (docker):
+* Client-server architecture
+* Client talks to the Docker daemon
+* The Docker daemon handles:
+    - Building
+    - Running
+    - Distributing
+    
+* Both communicate using a REST API:
+	- UNIX sockets
+	- Network interface
 
-Is how users interact with Docker
+
+##The Docker daemon (dockerd):
+
+* Listens for Docker API requests and manages Docker objects:
+	* Images
+	* Containers
+	* Networks
+	* Volumes
+
+
+###The Docker client (docker):
+
+
+How users interact with Docker
 Sends commands to dockerd
-Docker registries:
 
-Stores Docker images
-Public registry such as DockerHub
-Let you run your own private registry
-Docker objects:
+* Docker registries:
 
-Images:
+	* Stores Docker images
+	* Public registry such as DockerHub
+	* Let you run your own private registry
+
+
+##Docker objects:
+
+
+###Images:
 Read-only template with instructions for creating a Docker container
 Image is based on another image
 Create your own images
 Use images published to a registry
 Use a Dockerfile to build images
-Containers:
+
+###Containers:
 Runnable instance of an image
 Connect a container to networks
 Attach storage
 Create a new image based on its current state
 Isolated from other containers and the host machine
-Services
+
+###Services
 Scale containers across multiple Docker daemons
 Docker Swarm
 Define the desired state
 Service is load-balanced
-Docker Swarm:
+
+
+###Docker Swarm:
 
 Multiple Docker daemons (Master and Workers)
 The daemons all communicate using the Docker API
@@ -53,59 +67,83 @@ Supported in Docker 1.12 and higher
 
 
 
-Under The Hood
-Docker engine:
 
-Modular in design:
-Batteries included but replaceable
-Based on open-standards outline by the Open Container Initiative
-The major components:
-Docker client
-Docker daemon
-containerd
-runc
-The components work together to create and run containers
-A Brief History of the Docker Engine
-The first release of Docker:
 
-The Docker daemon:
+#Under The Hood
+
+
+##Docker engine:
+
+* Modular in design:
+    Batteries included but replaceable
+* Based on open-standards outline by the Open Container Initiative
+
+* The major components:
+    - Docker client
+    - Docker daemon
+    - containerd
+    - runc
+* The components work together to create and run containers
+
+
+
+
+##A Brief History of the Docker Engine
+
+
+###The first release of Docker:
+
+* The Docker daemon:
 Monolithic binary
 Docker client
 Docker API
 Container runtime
 Image builds
 Much more...
-LXC:
+
+* LXC:
 Namespaces
 Control groups (cgroups)
 Linux-specific
-Refactoring of the Docker Engine
-LXC was later replaced with libcontainer:
 
+
+
+##Refactoring of the Docker Engine
+
+
+###LXC was later replaced with libcontainer:
 Docker 0.9
-Platform agnostic
-Issues with the monolithic Docker daemon:
+Platform agnostic<br/>
 
+###Issues with the monolithic Docker daemon:
 Harder to innovate
 Slow
-Not what the ecosystem wanted
-Docker became more modular:
+Not what the ecosystem wanted<br/>
+
+
+###Docker became more modular:
 
 Smaller more specialized tools
 Pluggable architecture
-Open Container Initiative:
+
+
+###Open Container Initiative:
 
 Image spec
 Container runtime spec
 Version 1.0 release in 2017
 Docker Inc. heavily contributed
 Docker 1.11 (2016) used the specification as much as possible
-runc:
+
+
+###runc:
 
 Implemenation of the OCI container-runtime-spec
 Lightweght CLI wrapper for libcontainer
 Create containers
-containerd:
+
+
+###containerd:
 
 Manages container lifecycle
 Start
@@ -114,7 +152,9 @@ Pause
 Delete
 Image management
 Part of the 1.11 release
-shim:
+
+
+###shim:
 
 Implemenation of daemonless Containers
 containerd forks an instance of runc for each new container
@@ -123,9 +163,13 @@ shim process becomes the container parent
 Responsible for:
 STDIN and STDOUT
 Reporting exit status to the Docker daemon
-Running Containers
-docker container run -it --name <NAME> <IMAGE>:<TAG>
-Creating a container:
+
+
+##Running Containers
+
+`docker container run -it --name <NAME> <IMAGE>:<TAG>`
+
+**Creating a container:**
 
 CLI use for executing a command
 Docker client uses the appropriate API payload
@@ -139,11 +183,10 @@ runc interfaces with the OS kernal to get the constructs needed to create a cont
 This includes namespaces, cgroups, etc.
 Container process starts as a child process
 runc exits once the container starts
-Process is complete, and container is running
+Process is complete, and container is running<br/><br/><br/>
 
+#What are Docker images?<br/>
 
-
-What are Docker images?
 Docker Images:
 
 Files comprised of multiple layers
@@ -160,30 +203,25 @@ Containers add new writable layers on top of the underlying layers
 All changes made to a running container is made to the Container layer
 What are containers?
 A container is a standard unit of software that packages up code and all its dependencies so the application runs quickly and reliably from one computing environment to another.
-
 Container and layers
 Top writable layer
 All changes are stored in the writable layer
 The writable layer is deleted when the container is deleted
-The image remains unchanged
+The image remains unchanged<br/><br/><br/>
 
+#What is Docker Hub?<br/>
 
+##Docker Hub:
 
-What is Docker Hub?
-Docker Hub:
-
-Public Docker registry
-Provided by Docker
-Features:
-Repositories
-Teams and Organizations
-Official Images
-Publisher Images
-Builds
-Webhooks
-https://hub.docker.com/signup
-
-
+*Public Docker registry
+*Provided by Docker
+*Features:
+    -Repositories
+    -Teams and Organizations
+    -Official Images
+    -Publisher Images
+    -Builds
+    -Webhooks
 
 Management Commands:
 
@@ -244,10 +282,6 @@ unpause Unpause all processes within one or more containers
 update Update configuration of one or more containers
 wait Block until one or more containers stop, then print their exit codes
 
-
-
-
-
 Creating Containers
 In this lesson, we will take a deeper look into creating containers, by exploring a few of the flags that will alter it's behavior when created.
 
@@ -273,10 +307,6 @@ Create a container that you name and run it in the background:
 
 docker container run –d –name myContainer busybox
 
-
-
-
-
 Exposing and Publishing Container Ports
 Building on what we've already learned, this lesson will focus on exposing ports on a container, as well as how to publish them.
 
@@ -301,10 +331,6 @@ docker container port [Container_NAME]
 Executing Container Commands
 In this lesson we'll see three different ways to execute commands on containers.
 
-
-
-
-
 Executing a command:
 
 Dockerfile
@@ -327,12 +353,6 @@ docker container ps
 docker container exec -it [NAME] /bin/bash
 docker container exec -it [NAME] ls /usr/share/nginx/html/
 
-
-
-
-
-
-
 Container Logging
 In this lesson, you will learn how to view the logs of a container to get vital output of your application. You will also learn about some of the logging best practices of containerized applications.
 
@@ -350,7 +370,9 @@ Logs need to be output to STDOUT and STDERR.
 Nginx Example:
 
 RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+
     && ln -sf /dev/stderr /var/log/nginx/error.log
+
 Debug a failed container deploy:
 
 docker container run -d --name ghost_blog \
@@ -361,6 +383,3 @@ docker container run -d --name ghost_blog \
 -e database__connection__database=ghost \
 -p 8080:2368 \
 ghost:1-alpine
-
-
-

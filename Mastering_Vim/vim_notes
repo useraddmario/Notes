@@ -1,3 +1,25 @@
+Recording a macro
+Each register is identified by a letter a to z.
+
+To enter a macro, type:
+
+q<letter><commands>q
+To execute the macro <number> times (once by default), type:
+
+<number>@<letter>
+So, the complete process looks like:
+
+qd	start recording to register d
+...	your complex series of commands
+q	stop recording
+@d	execute your macro
+@@	execute your macro again
+
+
+
+
+
+
 w   move to beginning of next word
 e   move to the end of the next word
 b   move backwards to the beginning of the next word
