@@ -404,3 +404,46 @@
 `-e database__connection__database=ghost \`
 `-p 8080:2368 \`
 `ghost:1-alpine`
+
+
+# Networking Overview
+
+## Docker Networking 101
+
+### Docker Networking:
+
+* Open-source pluggable architecture
+* Container Network Model (CNM)
+* libnetwork implements CNM
+* Drivers extend the network topologies
+
+### Network Drivers:
+
+* bridge
+* host
+* overlay
+* macvlan
+* none
+* Network plugins
+
+## Container Network Model
+
+###Defines three building blocks:
+
+* Sandboxes
+* Endpoints
+* Networks
+
+
+
+
+
+
+
+
+
+
+
+
+
+
