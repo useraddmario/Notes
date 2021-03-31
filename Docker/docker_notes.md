@@ -1,4 +1,4 @@
-#Docker architecture:
+# Docker architecture:
 
 
 * Client-server architecture
@@ -13,7 +13,7 @@
 	- Network interface
 
 
-##The Docker daemon (dockerd):
+## The Docker daemon (dockerd):
 
 * Listens for Docker API requests and manages Docker objects:
 	* Images
@@ -22,7 +22,7 @@
 	* Volumes
 
 
-###The Docker client (docker):
+# The Docker client (docker):
 
 
 How users interact with Docker
@@ -35,31 +35,31 @@ Sends commands to dockerd
 	* Let you run your own private registry
 
 
-##Docker objects:
+## Docker objects:
 
 
-###Images:
+# Images:
 Read-only template with instructions for creating a Docker container
 Image is based on another image
 Create your own images
 Use images published to a registry
 Use a Dockerfile to build images
 
-###Containers:
+# Containers:
 Runnable instance of an image
 Connect a container to networks
 Attach storage
 Create a new image based on its current state
 Isolated from other containers and the host machine
 
-###Services
+# Services
 Scale containers across multiple Docker daemons
 Docker Swarm
 Define the desired state
 Service is load-balanced
 
 
-###Docker Swarm:
+# Docker Swarm:
 
 Multiple Docker daemons (Master and Workers)
 The daemons all communicate using the Docker API
@@ -69,10 +69,10 @@ Supported in Docker 1.12 and higher
 
 
 
-#Under The Hood
+# Under The Hood
 
 
-##Docker engine:
+## Docker engine:
 
 * Modular in design:
     Batteries included but replaceable
@@ -88,10 +88,10 @@ Supported in Docker 1.12 and higher
 
 
 
-##A Brief History of the Docker Engine
+ # Brief History of the Docker Engine
 
 
-###The first release of Docker:
+## The first release of Docker:
 
 * The Docker daemon:
 Monolithic binary
@@ -108,26 +108,26 @@ Linux-specific
 
 
 
-##Refactoring of the Docker Engine
+## Refactoring of the Docker Engine
 
 
-###LXC was later replaced with libcontainer:
+# LXC was later replaced with libcontainer:
 Docker 0.9
 Platform agnostic<br/>
 
-###Issues with the monolithic Docker daemon:
+# Issues with the monolithic Docker daemon:
 Harder to innovate
 Slow
 Not what the ecosystem wanted<br/>
 
 
-###Docker became more modular:
+# Docker became more modular:
 
 Smaller more specialized tools
 Pluggable architecture
 
 
-###Open Container Initiative:
+# Open Container Initiative:
 
 Image spec
 Container runtime spec
@@ -136,14 +136,14 @@ Docker Inc. heavily contributed
 Docker 1.11 (2016) used the specification as much as possible
 
 
-###runc:
+# runc:
 
 Implemenation of the OCI container-runtime-spec
 Lightweght CLI wrapper for libcontainer
 Create containers
 
 
-###containerd:
+# containerd:
 
 Manages container lifecycle
 Start
@@ -154,7 +154,7 @@ Image management
 Part of the 1.11 release
 
 
-###shim:
+# shim:
 
 Implemenation of daemonless Containers
 containerd forks an instance of runc for each new container
@@ -165,7 +165,7 @@ STDIN and STDOUT
 Reporting exit status to the Docker daemon
 
 
-##Running Containers
+## Running Containers
 
 `docker container run -it --name <NAME> <IMAGE>:<TAG>`
 
@@ -185,7 +185,7 @@ Container process starts as a child process
 runc exits once the container starts
 Process is complete, and container is running<br/><br/><br/>
 
-#What are Docker images?<br/>
+## What are Docker images?<br/>
 
 Docker Images:
 
@@ -209,9 +209,9 @@ All changes are stored in the writable layer
 The writable layer is deleted when the container is deleted
 The image remains unchanged<br/><br/><br/>
 
-#What is Docker Hub?<br/>
+# What is Docker Hub?<br/>
 
-##Docker Hub:
+## Docker Hub:
 
 *Public Docker registry
 *Provided by Docker
@@ -282,10 +282,10 @@ unpause Unpause all processes within one or more containers
 update Update configuration of one or more containers
 wait Block until one or more containers stop, then print their exit codes
 
-Creating Containers
+## Creating Containers
 In this lesson, we will take a deeper look into creating containers, by exploring a few of the flags that will alter it's behavior when created.
 
-docker container run:
+## docker container run:
 
 --help Print usage
 --rm Automatically remove the container when it exits
@@ -297,26 +297,32 @@ docker container run:
 -v, --volume list Mount a volume (the bind type of mount)
 --mount mount Attach a filesystem mount to the container
 --network string Connect a container to a network (default "default")
-Create a container and attach to it:
+
+### Create a container and attach to it:
 
 docker container run –it busybox
-Create a container and run it in the background:
+
+### Create a container and run it in the background:
 
 docker container run –d nginx
-Create a container that you name and run it in the background:
+
+### Create a container that you name and run it in the background:
 
 docker container run –d –name myContainer busybox
 
-Exposing and Publishing Container Ports
+## Exposing and Publishing Container Ports
+
 Building on what we've already learned, this lesson will focus on exposing ports on a container, as well as how to publish them.
 
-Exposing:
+## Exposing:
 
 Expose a port or a range of ports
 This does not publish the port
 Use --expose [PORT]
 docker container run --expose 1234 [IMAGE]
-Publishing:
+
+
+## Publishing:
 
 Maps a container's port to a host`s port
 -p or --publish publishes a container's port(s) to the host
@@ -328,22 +334,26 @@ Lists all port mappings or a specific mapping for a container:
 
 docker container port [Container_NAME]
 
-Executing Container Commands
+## Executing Container Commands
 In this lesson we'll see three different ways to execute commands on containers.
 
-Executing a command:
+# Executing a command:
 
 Dockerfile
 During a Docker run
 Using the exec command
-Commands can be:
+
+### Commands can be:
 
 One and done Commands
 Long running Commands
-Start a container with a command:
+
+## Start a container with a command:
 
 docker container run [IMAGE] [CMD]
-Execute a command on a container:
+
+
+## Execute a command on a container:
 
 docker container exec -it [NAME] [CMD]
 Example:
@@ -353,27 +363,32 @@ docker container ps
 docker container exec -it [NAME] /bin/bash
 docker container exec -it [NAME] ls /usr/share/nginx/html/
 
-Container Logging
-In this lesson, you will learn how to view the logs of a container to get vital output of your application. You will also learn about some of the logging best practices of containerized applications.
+# Container Logging
 
-Create a container using the weather-app image.
+## Create a container using the weather-app image.
 
 docker container run --name weather-app -d -p 80:3000 linuxacademycontent/weather-app
-Show information logged by a running container:
+
+
+## Show information logged by a running container:
 
 docker container logs [NAME]
-Show information logged by all containers participating in a service:
+
+
+## Show information logged by all containers participating in a service:
 
 docker service logs [SERVICE]
-Logs need to be output to STDOUT and STDERR.
 
-Nginx Example:
+
+## Logs need to be output to STDOUT and STDERR.
+
+### Nginx Example:
 
 RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
-Debug a failed container deploy:
+## Debug a failed container deploy:
 
 docker container run -d --name ghost_blog \
 -e database__client=mysql \
