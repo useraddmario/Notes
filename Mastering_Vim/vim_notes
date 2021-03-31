@@ -96,4 +96,6 @@ horizontal split
 :vsplit :vs
 vertical split
 
+Edit all lines of visual selection
+Ctrl-v, select lines, Shift + i, Esc twice
 
