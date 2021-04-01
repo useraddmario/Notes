@@ -286,9 +286,9 @@
 
 ## Creating Containers
 
-` docker container run:`
+` docker container run --help
 
-`--help Print usage`
+
 `--rm Automatically remove the container when it exits`
 `-d, --detach Run container in background and print container ID`
 `-i, --interactive Keep STDIN open even if not attached`
@@ -435,9 +435,9 @@
 * Networks - software implementations of the 802.1D bridge
 
 
-##Networking Commands
+## Networking Commands
 
-###Networking Basics
+### Networking Basics
 
 `ifconfig`
 
@@ -464,7 +464,7 @@ List all Docker networks on the host:
 `docker network ls`
 
 **Default Docker networks:**
-`[cloud_user@ed8c4f7c1f1c ~]$ docker network ls`
+`docker network ls`
 `NETWORK ID          NAME                DRIVER              SCOPE`
 `f7ddb9f1e359        bridge              bridge              local`
 `1ca008bd8b6f        host                host                local`
@@ -493,9 +493,11 @@ f7ddb9f1e3591853cb69b904164b59f68b8a23e4cc4b6b5edf8836f5f1339739: bridge local
 Creating a network:
 
 `docker network create br00`
+<br/>
 `ecee34a4de25d5c16b5a51088f036676a5199ccc90c320e3c5d6fe385f1d4a1a`
 
 `docker network inspect br00`
+<br/>
 `[`
     `{`
         `"Name": "br00",`
@@ -536,7 +538,7 @@ Remove all unused networks
 `docker network prune`
 
 
-###Adding and Removing containers to a network
+### Adding and Removing containers to a network
 
 Create a container with no network:
 
@@ -555,6 +557,7 @@ Inspect network-test03 to see the networks:
 `docker container inspect network-test03`
 
 `docker container inspect network-test03 --format='{{json .NetworkSettings}}' | jq`
+<br/>
 `{`
   `"Bridge": "",`
   `"SandboxID": "f4a240cf4e6466fcb37a90cb312999df5fc02ad7ef10b725a6b044c8f1295f21",`
@@ -626,9 +629,9 @@ Remove network-test03 from br01:
 
 
 
-##Networking Containers
+## Networking Containers
 
-###Creating a network and defining a Subnet and Gateway
+### Creating a network and defining a Subnet and Gateway
 
 
 Create a bridge network with a subnet and gateway:
