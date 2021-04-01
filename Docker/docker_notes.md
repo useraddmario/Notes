@@ -419,28 +419,343 @@
 
 ### Network Drivers:
 
-* bridge
-* host
-* overlay
-* macvlan
-* none
-* Network plugins
+* bridge - **link layer device**, **default network**, layer of isolation, only works on Linux
+* host - standalone containers, uses the host’s networking directly 
+* overlay - connect multiple Docker daemons together for swarm services to communicate; can use overlay networks for communication between a swarm service and a standalone container, or between two standalone containers on different Docker daemons; no need to do OS-level routing between these containers
+* macvlan -  allow you to assign a MAC address to a container; best for legacy, network monitoring app or smth that expects a hardware connection
+* none - disable all networking, used in conjunction with a custom network driver; not available for swarm services
+* Network plugins - install and use 3rd party network plugins with Docker plugins are available from Docker Hub or from 3rd party vendors
 
 ## Container Network Model
 
 ### Defines three building blocks:
 
-* Sandboxes
-* Endpoints
-* Networks
+* Sandboxes - isolates network stack including the network interfaces, ports, route tables and DNS
+* Endpoints - virt NICs; responsible for connection to Sandbox
+* Networks - software implementations of the 802.1D bridge
+
+
+##Networking Commands
+
+###Networking Basics
+
+`ifconfig`
+
+**Docker uses:**
+Class B network inet 172.17.0.1 netmask 255.255.0.0 /16 65534
+
+`docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500`
+        `inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255`
+        `ether 02:42:49:3b:29:0b  txqueuelen 0  (Ethernet)`
+        `RX packets 0  bytes 0 (0.0 B)`
+        `RX errors 0  dropped 0  overruns 0  frame 0`
+        `TX packets 0  bytes 0 (0.0 B)`
+        `TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0`
+
+
+List all Docker network commands:
+
+`docker network -h`
+
+**Command Summary:** connect - Connect a container to a network create - Create a network disconnect - Disconnect a container from a network inspect - Display detailed information on one or more networks ls - List networks prune - Remove all unused networks rm - Remove one or more networks
+
+List all Docker networks on the host:
+
+`docker network ls`
+
+**Default Docker networks:**
+`[cloud_user@ed8c4f7c1f1c ~]$ docker network ls`
+`NETWORK ID          NAME                DRIVER              SCOPE`
+`f7ddb9f1e359        bridge              bridge              local`
+`1ca008bd8b6f        host                host                local`
+`d7d7d6a04bd9        none                null                local`
+
+
+
+`docker network ls --no-trunc`
+
+Getting detailed info on a network:
+
+`docker network inspect [NAME]`
+
+docker network inspect bridge --format='{{.IPAM.Config}}'
+[{172.17.0.0/16  172.17.0.1 map[]}]
+
+docker network inspect bridge --format='{{json .IPAM.Config}}'
+[{"Subnet":"172.17.0.0/16","Gateway":"172.17.0.1"}]
+
+docker network inspect bridge --format='{{range .IPAM.Config}}{{.Subnet}}{{end}}'
+172.17.0.0/16
+
+docker network inspect bridge --format '{{.ID}}: {{.Driver}} {{.Scope}}'
+f7ddb9f1e3591853cb69b904164b59f68b8a23e4cc4b6b5edf8836f5f1339739: bridge local
+
+Creating a network:
+
+`docker network create br00`
+`ecee34a4de25d5c16b5a51088f036676a5199ccc90c320e3c5d6fe385f1d4a1a`
+
+`docker network inspect br00`
+`[`
+    `{`
+        `"Name": "br00",`
+        `"Id": "ecee34a4de25d5c16b5a51088f036676a5199ccc90c320e3c5d6fe385f1d4a1a",`
+        `"Created": "2021-04-01T04:55:05.503208315Z",`
+        `"Scope": "local",`
+        `"Driver": "bridge",`
+        `"EnableIPv6": false,`
+        `"IPAM": {`
+            `"Driver": "default",`
+            `"Options": {},`
+            `"Config": [`
+                `{`
+                    `"Subnet": "172.18.0.0/16",`
+                    `"Gateway": "172.18.0.1"`
+                `}`
+            `]`
+        `},`
+        `"Internal": false,`
+        `"Attachable": false,`
+        `"Ingress": false,`
+        `"ConfigFrom": {`
+            `"Network": ""`
+        `},`
+        `"ConfigOnly": false,`
+        `"Containers": {},`
+        `"Options": {},`
+        `"Labels": {}`
+    `}`
+`]`
+
+Deleting a network:
+
+`docker network rm [NAME]`
+
+Remove all unused networks
+
+`docker network prune`
+
+
+###Adding and Removing containers to a network
+
+Create a container with no network:
+
+`docker container run -d --name network-test03 -p 8081:80 nginx`
+
+Create a new network:
+
+`docker network create br01`
+
+Add the container to the bridge network:
+
+`docker network connect br01 network-test03`
+
+Inspect network-test03 to see the networks:
+
+`docker container inspect network-test03`
+
+`docker container inspect network-test03 --format='{{json .NetworkSettings}}' | jq`
+`{`
+  `"Bridge": "",`
+  `"SandboxID": "f4a240cf4e6466fcb37a90cb312999df5fc02ad7ef10b725a6b044c8f1295f21",`
+  `"HairpinMode": false,`
+  `"LinkLocalIPv6Address": "",`
+  `"LinkLocalIPv6PrefixLen": 0,`
+  `"Ports": {`
+    `"80/tcp": [`
+      `{`
+        `"HostIp": "0.0.0.0",`
+        `"HostPort": "8081"`
+      `}`
+    `]`
+  `},`
+  `"SandboxKey": "/var/run/docker/netns/f4a240cf4e64",`
+  `"SecondaryIPAddresses": null,`
+  `"SecondaryIPv6Addresses": null,`
+  `"EndpointID": "b9b182ef1a00ef9cadfdbb6c5a8880fb06a09de0a359d757fac6205c4b04a16c",`
+  `"Gateway": "172.17.0.1",`
+  `"GlobalIPv6Address": "",`
+  `"GlobalIPv6PrefixLen": 0,`
+  `"IPAddress": "172.17.0.2",`
+  `"IPPrefixLen": 16,`
+  `"IPv6Gateway": "",`
+  `"MacAddress": "02:42:ac:11:00:02",`
+  `"Networks": {`
+    `"br01": {`
+      `"IPAMConfig": {},`
+      `"Links": null,`
+      `"Aliases": [`
+        `"b1c944bc3942"`
+      `],`
+      `"NetworkID": "0112218a887d9bdd6d855a73b9126bf5897271ec2cccd5b4a7553ecf31bb3f2e",`
+      `"EndpointID": "e4bf48be7337bc2d4011630c03ba254127e0c8f295e51488f7ac067c7b183ee6",`
+      `"Gateway": "172.19.0.1",`
+      `"IPAddress": "172.19.0.2",`
+      `"IPPrefixLen": 16,`
+      `"IPv6Gateway": "",`
+      `"GlobalIPv6Address": "",`
+      `"GlobalIPv6PrefixLen": 0,`
+      `"MacAddress": "02:42:ac:13:00:02",`
+      `"DriverOpts": null`
+    `},`
+    `"bridge": {`
+      `"IPAMConfig": null,`
+      `"Links": null,`
+      `"Aliases": null,`
+      `"NetworkID": "f7ddb9f1e3591853cb69b904164b59f68b8a23e4cc4b6b5edf8836f5f1339739",`
+      `"EndpointID": "b9b182ef1a00ef9cadfdbb6c5a8880fb06a09de0a359d757fac6205c4b04a16c",`
+      `"Gateway": "172.17.0.1",`
+      `"IPAddress": "172.17.0.2",`
+      `"IPPrefixLen": 16,`
+      `"IPv6Gateway": "",`
+      `"GlobalIPv6Address": "",`
+      `"GlobalIPv6PrefixLen": 0,`
+      `"MacAddress": "02:42:ac:11:00:02",`
+      `"DriverOpts": null`
+    `}`
+  `}`
+`}`
 
 
 
 
+Remove network-test03 from br01:
+
+`docker network disconnect br01 network-test03`
 
 
 
 
+##Networking Containers
+
+###Creating a network and defining a Subnet and Gateway
+
+
+Create a bridge network with a subnet and gateway:
+
+`docker network create --subnet 10.1.0.0/24 --gateway 10.1.0.1 br02`
+
+
+Run ifconfig to view the bridge interface for br02:
+
+`ifconfig`
+
+
+Inspect the br02 network:
+
+`docker network inspect br02`
+
+
+Prune all unused networks:
+
+`docker network prune`
+
+
+Create a network with an IP range:
+
+`docker network create --subnet 10.1.0.0/16 --gateway 10.1.0.1 \`
+`--ip-range=10.1.4.0/24 --driver=bridge --label=host4network br04`
+
+
+Inspect the br04 network:
+
+`docker network inspect br04`
+
+
+Create a container using the br04 network:
+
+`docker container run --name network-test01 -it --network br04 centos /bin/bash`
+
+
+Install Net Tools:
+
+yum install -y net-tools
+
+
+Get the IP info for the container:
+
+`ifconfig`
+
+
+Get the gateway info the container:
+
+`netstat -rn`
+
+
+Get the DNS info for the container:
+
+`cat /etc/resolv.conf`
+
+**Docker manages /etc/hostname /etc/resolv.conf /etc/hosts**
+
+
+Assigning IPs to a container:
+
+Create a new container and assign an IP to it:
+
+`docker container run -d --name network-test02 --ip 10.1.4.102 --network br04 nginx`
+
+
+Get the IP info for the container:
+
+`docker container inspect network-test02 | grep IPAddr`
+
+docker container inspect network-test02 --format='{{json .NetworkSettings.Networks.br04.IPAddress}}' | jq
+"10.1.4.102"
+or
+docker container inspect network-test02 --format='{{.NetworkSettings.Networks.br04.IPAddress}}'
+10.1.4.102
+
+
+Inspect network-test03 to see that br01 was removed:
+
+`docker container inspect network-test04`
+
+
+Networking two containers
+
+Create an internal network:
+
+`docker network create -d bridge --internal localhost`
+
+
+Create a MySQL container that is connected to localhost:
+
+`docker container run -d --name test_mysql \`
+`-e MYSQL_ROOT_PASSWORD=P4sSw0rd0 \`
+`--network localhost mysql:5.7`
+
+
+Create a container that can ping the MySQL container:
+
+`docker container run -it --name ping-mysql \`
+`--network bridge \`
+`centos`
+
+
+Connect ping-mysql to the localhost network:
+
+`docker network connect localhost ping-mysql`
+
+
+Restart and attach to container:
+
+`docker container start -ia ping-mysql`
+
+
+Create a container that can't ping the MySQL container:
+
+`docker container run -it --name cant-ping-mysql centos`
+
+
+Create a Nginx container that is not publicly accessible:
+
+`docker container run -d --name private-nginx -p 8081:80 --network localhost nginx`
+
+
+Inspect private-nginx:
+
+`docker container inspect private-nginx`
 
 
 
