@@ -29,7 +29,7 @@
 * How users interact with Docker
 * Sends commands to dockerd <br/>
 
-###Docker registries:
+### Docker registries:
 
 * Stores Docker images
 * Public registry such as DockerHub
@@ -311,7 +311,7 @@
 
 `docker container run –d –name myContainer busybox`
 <br/>
-<br/>
+
 
 # Exposing and Publishing Container Ports
 
@@ -428,7 +428,7 @@
 
 ## Container Network Model
 
-###Defines three building blocks:
+### Defines three building blocks:
 
 * Sandboxes
 * Endpoints
