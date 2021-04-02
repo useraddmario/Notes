@@ -1114,8 +1114,9 @@ CMD python /app/app.py
 
 
 
+# Dockerfile
 
-# Working with Instructions
+## Working with Instructions
 
 
 * ` FROM: `Initializes a new build stage and sets the Base Image
@@ -1215,7 +1216,7 @@ Use the --env flag to pass an environment variable when building an image:
 
 Use the ENV instruction in the Dockerfile:
 
-`ENV [KEY]=[VALUE]  `
+`ENV [KEY]=[VALUE]`
 `ENV [KEY] [VALUE]`
 
 
@@ -1299,6 +1300,8 @@ Get the logs for weather-app2:
 
 
 # Build Arguments
+
+**Used to parameterize image builds**
 
 Use the --build-arg flag when building an image:
 
@@ -1455,8 +1458,9 @@ WORKDIR /home/node_user
 RUN npm install
 EXPOSE 3000
 CMD ./bin/www
-git clone https://github.com/linuxacademy/content-weather-app.git src
 ```
+
+git clone https://github.com/linuxacademy/content-weather-app.git src
 
 
 
@@ -1469,6 +1473,7 @@ Build the weather-app image using the non-privileged user node_user:
 Create a container using the linuxacademy/weather-app-nonroot:v1 image:
 
 `docker container run -d --name weather-app-nonroot -p 8086:3000 linuxacademy/weather-app-nonroot:v1`
+
 
 
 
@@ -1516,7 +1521,10 @@ Build the new image:
 
 
 
-Using the Volume Instruction
+## Using the Volume Instruction
+
+Used to automatically create a mount point in a Docker image, a volume will be created and mounted to the specified directory.
+
 
 Set up your environment:
 
